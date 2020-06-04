@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 WorldCupJson::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -9,6 +11,7 @@ WorldCupJson::Application.configure do
   # and those relying on copy on write to perform better.
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
+  config.lograge.enabled = true
 
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
@@ -31,6 +34,7 @@ WorldCupJson::Application.configure do
 
   # Generate digests for assets URLs.
   config.assets.digest = true
+  config.assets.quiet = true
 
   # Version of your assets, change this if you want to expire all your assets.
   config.assets.version = '1.0'

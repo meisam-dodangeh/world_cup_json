@@ -9,7 +9,7 @@ class BaseApiController < ApplicationController
 
   rescue_from StandardError do |error|
     notify_airbrake(error)
-    unprocesssable_entity(error)
+    unprocessable_entity(error)
   end
 
   rescue_from ActiveRecord::RecordNotFound do |error|
@@ -24,12 +24,13 @@ class BaseApiController < ApplicationController
                   elsif Match.today.future.count.positive?
                     1.minute
                   else
-                    10.minutes
-                  end
+                    5.minutes
+    end
   end
 
   def set_jsonp_format
     return unless params[:callback] && request.get?
+
     self.response_body = "#{params[:callback]}(#{response.body})"
     headers['Content-Type'] = 'application/javascript'
   end

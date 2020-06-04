@@ -21,9 +21,9 @@ module Scrapers
         puts "Stats saved for #{@match.name}"
       elsif @try_counter < 5
         @try_counter += 1
-        puts "Trying again in 5 seconds..."
+        puts 'Trying again in 5 seconds...'
         sleep(5)
-        self.scrape
+        scrape
       else
         puts "Skipped Match: #{@match.name}"
       end
@@ -32,7 +32,7 @@ module Scrapers
     private
 
     def scraper_url
-      base_url = 'https://www.fifa.com/worldcup/matches/match'
+      base_url = 'https://www.fifa.com/womensworldcup/matches/match'
       "#{base_url}/#{@match.fifa_id}/#match-statistics"
     end
 
@@ -44,9 +44,10 @@ module Scrapers
     end
 
     def write_match_stats
-      return nil if @try_counter >=5
+      return nil if @try_counter >= 5
       return nil if stats.empty?
       return nil unless write_stats
+
       @match.stats_complete = true if @match.status == 'completed'
       @match.save
     end
@@ -62,8 +63,9 @@ module Scrapers
       end
       success = home_stats.save && away_stats.save
       return true if success
-      puts "#{home_stats.errors.full_messages}"
-      puts "#{away_stats.errors.full_messages}"
+
+      puts home_stats.errors.full_messages.to_s
+      puts away_stats.errors.full_messages.to_s
       false
     end
 
@@ -85,24 +87,28 @@ module Scrapers
 
     def stats
       return @stats unless @stats.blank?
+
       @stats = @page.search('.fi-stats')
     end
 
     def parse_stats(tr_num, splitter)
       statistic = stats.search('tr')[tr_num]
       return nil unless statistic
+
       statistic&.text&.downcase&.split(splitter)
     end
 
     def home_team_stat(stat)
       stat = send(stat)
       return nil unless stat&.length == 2
+
       stat.first&.strip&.to_i
     end
 
     def away_team_stat(stat)
       stat = send(stat)
       return nil unless stat&.length == 2
+
       stat.last&.strip&.to_i
     end
 
@@ -123,35 +129,36 @@ module Scrapers
     end
 
     def woodwork
+      return nil #not used in WWC stats
       @woodwork ||= parse_stats(10, 'woodwork')
     end
 
     def corners
-      @corners ||= parse_stats(12, 'corners')
+      @corners ||= parse_stats(10, 'corners')
     end
 
     def offsides
-      @offsides ||= parse_stats(14, 'offsides')
+      @offsides ||= parse_stats(12, 'offsides')
     end
 
     def ball_possession
-      @ball_possession ||= parse_stats(16, 'ball possession')
+      @ball_possession ||= parse_stats(14, 'ball possession')
     end
 
     def pass_accuracy
-      @pass_accuracy ||= parse_stats(18, 'pass accuracy')
+      @pass_accuracy ||= parse_stats(16, 'pass accuracy')
     end
 
     def num_passes
-      @num_passes ||= parse_stats(20, 'passes')
+      @num_passes ||= parse_stats(18, 'passes')
     end
 
     def passes_completed
-      @passes_completed ||= parse_stats(22, 'passes completed')
+      @passes_completed ||= parse_stats(20, 'passes completed')
     end
 
     def distance_covered
-      @distance_covered ||= parse_stats(24, 'distance covered')
+      @distance_covered ||= parse_stats(22, 'distance covered')
     end
 
     def balls_recovered
@@ -159,31 +166,31 @@ module Scrapers
     end
 
     def tackles
-      @tackles ||= parse_stats(28, 'tackles')
+      @tackles ||= parse_stats(24, 'tackles')
     end
 
     def blocks
-      @blocks ||= parse_stats(30, 'blocks')
+      @blocks ||= parse_stats(26, 'blocks')
     end
 
     def clearances
-      @clearances ||= parse_stats(32, 'clearances')
+      @clearances ||= parse_stats(28, 'clearances')
     end
 
     def yellow_cards
-      @yellow_cards ||= parse_stats(34, 'yellow cards')
+      @yellow_cards ||= parse_stats(30, 'yellow cards')
     end
 
     def red_cards
-      @red_cards ||= parse_stats(36, 'red cards')
+      @red_cards ||= parse_stats(32, 'direct red cards')
     end
 
     def second_yellow
-      @second_yellow ||= parse_stats(38, 'second yellow card and red card')
+      @second_yellow ||= parse_stats(34, 'indirect red cards')
     end
 
     def fouls_committed
-      @fouls_committed ||= parse_stats(40, 'fouls committed')
+      @fouls_committed ||= parse_stats(36, 'fouls committed')
     end
   end
 end

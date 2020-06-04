@@ -1,9 +1,9 @@
-# FIFA WORLD CUP 2018
+# FIFA WOMENS WORLD CUP 2019
 
-This should now be working for the World Cup in 2018!  
-Should have all events and goals and match stats streaming live, please file an issue or hit me up on twitter @mutualarisisg if anything has gone awry.
+This should now be working for the World Cup in 2018!
+Should have all events and goals and match stats streaming live, please file an issue or hit me up on twitter @mutualarising if anything has gone awry.
 
-https://worldcup.sfg.io  
+https://worldcup.sfg.io
 (HTTPS working for default domain now :yay:)
 
 Special thanks to my employer [Software For Good](https://softwareforgood.com/) for encouraging me to make this as a new programmer 4 years ago and then encourage me to update it for this year (and hosting it!) Encourage your employee's side projects - they learn things!
@@ -20,6 +20,10 @@ More updates at the end of the README
 
 ### Caveat Emptor
 
+This is setup as much as I can for the FIFA Women's World Cup (as of 4 June 2019).
+
+However, I will be out of town and off grid until at least Monday June 10th. If something doesn't work, it will have to wait until then to be fixed. It should work, I have verified all the endpoints, and the data structure as best as I can. Please file an issue and be patient if you notice anything strange!
+
 Note: FIFA is now using much more JS that they were 4 years ago to hide and show information. I'll try to make sure as the tournament goes on that things like penalties are showing up correctly. As always, this runs on a scraper. Changes to HTML structure or banning the IP address it is scraping from could break it at any time. PRs welcome.
 
 ## ABOUT
@@ -32,6 +36,8 @@ This is a simple backend for a scraper that grabs current world cup results and 
 
 * ```rake db:setup setup:generate_teams``` to initialize the database and generate the teams
 
+* initial run, run `rake scraper:force_all_new` `rake scraper:force_all_old` `rake scraper:setup_json`
+
 * Run the following three tasks as cron jobs (there are also one off scraper jobs you can hit in the `Scrapers::ScraperTasks` file at `lib/scrapers`)
 
   every short_time, `rake scraper:run_scraper`
@@ -41,6 +47,8 @@ This is a simple backend for a scraper that grabs current world cup results and 
   every day, `rake scraper:nightly_cleanup`
 
 * If you are setting up mid-tournament you'll need to run the following ScraperTasks: `scrape_old_matches`, `scrape_future_matches`, `scrape_for_stats`, `scrape_for_events`
+
+* If you have trouble setting up feel free to file a ticket and I or someone cal help. Sorry but things moving fast and more interested in keeping this running well than making it easy to setup at the moment.
 
 NOTE: The old scrapers are still there (`lib\tasks\match_scraper.rake`) but the new code is more memory efficient, does some error checking and cleaning up, doesn't break goals and events into two separate scrapes, and is greatly preferred
 
@@ -55,6 +63,9 @@ The current rate limit is 10 requests every 60 seconds. This is open to change a
 `[url]/matches/`
 for all matches (Example JSON object at the bottom of this README)
 
+Note - if you want all matches with all details,you must now pass `?details=true` to this endpoint.
+All details will be present by default for endpoints like `matches/today` that return less matches...
+
 `[url]/teams/results` results for each team (wins, losses, points, goals_for, goals_away, games_played)
 
 `[url]/teams/group_results` results for each group, teams ordered by current groups standings (more or less, not all head to head logic is programmed in as tiebreakers) - can also pass in `?group_id=B` to limit to a specific group.
@@ -66,7 +77,6 @@ for all matches (Example JSON object at the bottom of this README)
 [url]/matches/tomorrow/
 [url]/matches/current/
 ```
-
 
 You can also retrieve the matches for any team if you know their FIFA code (get fifa code from teams endpoint) by passing it in as a param.
 
@@ -117,188 +127,412 @@ The response includes the same data output as the regular GET call without param
 #### MATCH API ENDPOINT
 
 ```json
-{
-  "venue": "Saransk",
-  "location": "Mordovia Arena",
+[{
+  "venue": "Kazan",
+  "location": "Kazan Arena",
   "status": "completed",
   "time": "full-time",
-  "fifa_id": "300331550",
-  "datetime": "2018-06-19T12:00:00Z",
-  "last_event_update_at": "2018-06-19T13:54:02Z",
-  "last_score_update_at": "2018-06-19T13:52:45Z",
+  "fifa_id": "300331532",
+  "weather": {
+    "humidity": "40",
+    "temp_celsius": "28",
+    "temp_farenheit": "60",
+    "wind_speed": "18",
+    "description": "Sunny"
+  },
+  "attendance": "41835",
+  "officials": ["Mark GEIGER", "Joe FLETCHER", "Frank ANDERSON", "Julio BASCUNAN", "Danny MAKKELIE", "Corey ROCKWELL", "Tiago MARTINS", "Artur DIAS", "Christian SCHIEMANN"],
+  "stage_name": "First stage",
+  "home_team_country": "Korea Republic",
+  "away_team_country": "Germany",
+  "datetime": "2018-06-27T14:00:00Z",
+  "winner": "Korea Republic",
+  "winner_code": "KOR",
   "home_team": {
-    "country": "Colombia",
-    "code": "COL",
-    "goals": 1
+    "country": "Korea Republic",
+    "code": "KOR",
+    "goals": 2,
+    "penalties": 0
   },
   "away_team": {
-    "country": "Japan",
-    "code": "JPN",
-    "goals": 2
+    "country": "Germany",
+    "code": "GER",
+    "goals": 0,
+    "penalties": 0
   },
-  "winner": "Japan",
-  "winner_code": "JPN",
+  "home_team_events": [{
+    "id": 739,
+    "type_of_event": "yellow-card",
+    "player": "JUNG Wooyoung",
+    "time": "9'"
+  }, {
+    "id": 740,
+    "type_of_event": "yellow-card",
+    "player": "LEE Jaesung",
+    "time": "23'"
+  }, {
+    "id": 742,
+    "type_of_event": "yellow-card",
+    "player": "MOON Seonmin",
+    "time": "48'"
+  }, {
+    "id": 744,
+    "type_of_event": "substitution-out",
+    "player": "KOO Jacheol",
+    "time": "56'"
+  }, {
+    "id": 745,
+    "type_of_event": "substitution-in",
+    "player": "HWANG Heechan",
+    "time": "56'"
+  }, {
+    "id": 756,
+    "type_of_event": "yellow-card",
+    "player": "SON Heungmin",
+    "time": "65'"
+  }, {
+    "id": 759,
+    "type_of_event": "substitution-out",
+    "player": "MOON Seonmin",
+    "time": "69'"
+  }, {
+    "id": 760,
+    "type_of_event": "substitution-in",
+    "player": "JU Sejong",
+    "time": "69'"
+  }, {
+    "id": 766,
+    "type_of_event": "substitution-out",
+    "player": "HWANG Heechan",
+    "time": "79'"
+  }, {
+    "id": 767,
+    "type_of_event": "substitution-in",
+    "player": "GO Yohan",
+    "time": "79'"
+  }, {
+    "id": 774,
+    "type_of_event": "goal",
+    "player": "KIM Younggwon",
+    "time": "90'+3'"
+  }, {
+    "id": 775,
+    "type_of_event": "goal",
+    "player": "SON Heungmin",
+    "time": "90'+6'"
+  }],
+  "away_team_events": [{
+    "id": 748,
+    "type_of_event": "substitution-out",
+    "player": "Sami KHEDIRA",
+    "time": "58'"
+  }, {
+    "id": 749,
+    "type_of_event": "substitution-in",
+    "player": "Mario GOMEZ",
+    "time": "58'"
+  }, {
+    "id": 752,
+    "type_of_event": "substitution-out",
+    "player": "Leon GORETZKA",
+    "time": "63'"
+  }, {
+    "id": 753,
+    "type_of_event": "substitution-in",
+    "player": "Thomas MUELLER",
+    "time": "63'"
+  }, {
+    "id": 764,
+    "type_of_event": "substitution-out",
+    "player": "Jonas HECTOR",
+    "time": "78'"
+  }, {
+    "id": 765,
+    "type_of_event": "substitution-in",
+    "player": "Julian BRANDT",
+    "time": "78'"
+  }],
   "home_team_statistics": {
-    "attempts_on_goal": 8,
-    "on_target": 3,
-    "off_target": 1,
-    "blocked": 4,
+    "country": "Korea Republic",
+    "attempts_on_goal": 11,
+    "on_target": 5,
+    "off_target": 5,
+    "blocked": 1,
     "woodwork": 0,
     "corners": 3,
-    "offsides": 2,
-    "ball_possession": 42,
-    "pass_accuracy": 78,
-    "num_passes": 363,
-    "passes_completed": 284,
-    "distance_covered": 93,
-    "balls_recovered": 37,
-    "tackles": 17,
-    "clearances": 20,
-    "yellow_cards": 2,
-    "red_cards": 1,
-    "fouls_committed": 15,
-    "country": "Colombia"
+    "offsides": 0,
+    "ball_possession": 32,
+    "pass_accuracy": 71,
+    "num_passes": 252,
+    "passes_completed": 180,
+    "distance_covered": 117,
+    "balls_recovered": 40,
+    "tackles": 10,
+    "clearances": 39,
+    "yellow_cards": 4,
+    "red_cards": 0,
+    "fouls_committed": 16,
+    "tactics": "4-4-2",
+    "starting_eleven": [{
+      "name": "JO Hyeonwoo",
+      "captain": false,
+      "shirt_number": 23,
+      "position": "Goalie"
+    }, {
+      "name": "LEE Yong",
+      "captain": false,
+      "shirt_number": 2,
+      "position": "Defender"
+    }, {
+      "name": "YUN Youngsun",
+      "captain": false,
+      "shirt_number": 5,
+      "position": "Defender"
+    }, {
+      "name": "SON Heungmin",
+      "captain": true,
+      "shirt_number": 7,
+      "position": "Forward"
+    }, {
+      "name": "KOO Jacheol",
+      "captain": false,
+      "shirt_number": 13,
+      "position": "Midfield"
+    }, {
+      "name": "HONG Chul",
+      "captain": false,
+      "shirt_number": 14,
+      "position": "Defender"
+    }, {
+      "name": "JUNG Wooyoung",
+      "captain": false,
+      "shirt_number": 15,
+      "position": "Midfield"
+    }, {
+      "name": "LEE Jaesung",
+      "captain": false,
+      "shirt_number": 17,
+      "position": "Midfield"
+    }, {
+      "name": "MOON Seonmin",
+      "captain": false,
+      "shirt_number": 18,
+      "position": "Midfield"
+    }, {
+      "name": "KIM Younggwon",
+      "captain": false,
+      "shirt_number": 19,
+      "position": "Defender"
+    }, {
+      "name": "JANG Hyunsoo",
+      "captain": false,
+      "shirt_number": 20,
+      "position": "Defender"
+    }],
+    "substitutes": [{
+      "name": "KIM Seunggyu",
+      "captain": false,
+      "shirt_number": 1,
+      "position": "Goalie"
+    }, {
+      "name": "JUNG Seunghyun",
+      "captain": false,
+      "shirt_number": 3,
+      "position": "Defender"
+    }, {
+      "name": "OH Bansuk",
+      "captain": false,
+      "shirt_number": 4,
+      "position": "Defender"
+    }, {
+      "name": "PARK Jooho",
+      "captain": false,
+      "shirt_number": 6,
+      "position": "Defender"
+    }, {
+      "name": "JU Sejong",
+      "captain": false,
+      "shirt_number": 8,
+      "position": "Midfield"
+    }, {
+      "name": "KIM Shinwook",
+      "captain": false,
+      "shirt_number": 9,
+      "position": "Forward"
+    }, {
+      "name": "LEE Seungwoo",
+      "captain": false,
+      "shirt_number": 10,
+      "position": "Midfield"
+    }, {
+      "name": "HWANG Heechan",
+      "captain": false,
+      "shirt_number": 11,
+      "position": "Forward"
+    }, {
+      "name": "KIM Minwoo",
+      "captain": false,
+      "shirt_number": 12,
+      "position": "Defender"
+    }, {
+      "name": "KI Sungyueng",
+      "captain": false,
+      "shirt_number": 16,
+      "position": "Midfield"
+    }, {
+      "name": "KIM Jinhyeon",
+      "captain": false,
+      "shirt_number": 21,
+      "position": "Goalie"
+    }, {
+      "name": "GO Yohan",
+      "captain": false,
+      "shirt_number": 22,
+      "position": "Defender"
+    }]
   },
   "away_team_statistics": {
-    "attempts_on_goal": 14,
+    "country": "Germany",
+    "attempts_on_goal": 26,
     "on_target": 6,
-    "off_target": 5,
-    "blocked": 3,
+    "off_target": 11,
+    "blocked": 9,
     "woodwork": 0,
-    "corners": 6,
+    "corners": 8,
     "offsides": 1,
-    "ball_possession": 58,
-    "pass_accuracy": 84,
-    "num_passes": 546,
-    "passes_completed": 458,
-    "distance_covered": 101,
-    "balls_recovered": 40,
-    "tackles": 15,
-    "clearances": 24,
-    "yellow_cards": 1,
+    "ball_possession": 68,
+    "pass_accuracy": 87,
+    "num_passes": 715,
+    "passes_completed": 622,
+    "distance_covered": 114,
+    "balls_recovered": 38,
+    "tackles": 9,
+    "clearances": 10,
+    "yellow_cards": 0,
     "red_cards": 0,
-    "fouls_committed": 9,
-    "country": "Japan"
+    "fouls_committed": 7,
+    "tactics": "4-2-3-1",
+    "starting_eleven": [{
+      "name": "Manuel NEUER",
+      "captain": true,
+      "shirt_number": 1,
+      "position": "Goalie"
+    }, {
+      "name": "Jonas HECTOR",
+      "captain": false,
+      "shirt_number": 3,
+      "position": "Defender"
+    }, {
+      "name": "Mats HUMMELS",
+      "captain": false,
+      "shirt_number": 5,
+      "position": "Defender"
+    }, {
+      "name": "Sami KHEDIRA",
+      "captain": false,
+      "shirt_number": 6,
+      "position": "Midfield"
+    }, {
+      "name": "Toni KROOS",
+      "captain": false,
+      "shirt_number": 8,
+      "position": "Midfield"
+    }, {
+      "name": "Timo WERNER",
+      "captain": false,
+      "shirt_number": 9,
+      "position": "Forward"
+    }, {
+      "name": "Mesut OEZIL",
+      "captain": false,
+      "shirt_number": 10,
+      "position": "Midfield"
+    }, {
+      "name": "Marco REUS",
+      "captain": false,
+      "shirt_number": 11,
+      "position": "Forward"
+    }, {
+      "name": "Leon GORETZKA",
+      "captain": false,
+      "shirt_number": 14,
+      "position": "Midfield"
+    }, {
+      "name": "Niklas SUELE",
+      "captain": false,
+      "shirt_number": 15,
+      "position": "Defender"
+    }, {
+      "name": "Joshua KIMMICH",
+      "captain": false,
+      "shirt_number": 18,
+      "position": "Defender"
+    }],
+    "substitutes": [{
+      "name": "Marvin PLATTENHARDT",
+      "captain": false,
+      "shirt_number": 2,
+      "position": "Defender"
+    }, {
+      "name": "Matthias GINTER",
+      "captain": false,
+      "shirt_number": 4,
+      "position": "Defender"
+    }, {
+      "name": "Julian DRAXLER",
+      "captain": false,
+      "shirt_number": 7,
+      "position": "Midfield"
+    }, {
+      "name": "Kevin TRAPP",
+      "captain": false,
+      "shirt_number": 12,
+      "position": "Goalie"
+    }, {
+      "name": "Thomas MUELLER",
+      "captain": false,
+      "shirt_number": 13,
+      "position": "Midfield"
+    }, {
+      "name": "Antonio RUEDIGER",
+      "captain": false,
+      "shirt_number": 16,
+      "position": "Defender"
+    }, {
+      "name": "Sebastian RUDY",
+      "captain": false,
+      "shirt_number": 19,
+      "position": "Midfield"
+    }, {
+      "name": "Julian BRANDT",
+      "captain": false,
+      "shirt_number": 20,
+      "position": "Midfield"
+    }, {
+      "name": "Ilkay GUENDOGAN",
+      "captain": false,
+      "shirt_number": 21,
+      "position": "Midfield"
+    }, {
+      "name": "Marc-Andre TER STEGEN",
+      "captain": false,
+      "shirt_number": 22,
+      "position": "Goalie"
+    }, {
+      "name": "Mario GOMEZ",
+      "captain": false,
+      "shirt_number": 23,
+      "position": "Forward"
+    }, {
+      "name": "Jerome BOATENG",
+      "captain": false,
+      "shirt_number": 17,
+      "position": "Defender"
+    }]
   },
-  "home_team_events": [
-    {
-      "id": 203,
-      "type_of_event": "red-card",
-      "player": "Carlos SANCHEZ",
-      "time": "3'"
-    },
-    {
-      "id": 206,
-      "type_of_event": "substitution-in",
-      "player": "Wilmar BARRIOS",
-      "time": "31'"
-    },
-    {
-      "id": 205,
-      "type_of_event": "substitution-out",
-      "player": "Juan CUADRADO",
-      "time": "31'"
-    },
-    {
-      "id": 207,
-      "type_of_event": "goal",
-      "player": "Juan QUINTERO",
-      "time": "39'"
-    },
-    {
-      "id": 209,
-      "type_of_event": "substitution-in",
-      "player": "James RODRIGUEZ",
-      "time": "59'"
-    },
-    {
-      "id": 208,
-      "type_of_event": "substitution-out",
-      "player": "Juan QUINTERO",
-      "time": "59'"
-    },
-    {
-      "id": 210,
-      "type_of_event": "yellow-card",
-      "player": "Wilmar BARRIOS",
-      "time": "64'"
-    },
-    {
-      "id": 212,
-      "type_of_event": "substitution-in",
-      "player": "Carlos BACCA",
-      "time": "70'"
-    },
-    {
-      "id": 211,
-      "type_of_event": "substitution-out",
-      "player": "Jose IZQUIERDO",
-      "time": "70'"
-    },
-    {
-      "id": 220,
-      "type_of_event": "yellow-card",
-      "player": "James RODRIGUEZ",
-      "time": "86'"
-    }
-  ],
-  "away_team_events": [
-    {
-      "id": 204,
-      "type_of_event": "goal-penalty",
-      "player": "Shinji KAGAWA",
-      "time": "6'"
-    },
-    {
-      "id": 214,
-      "type_of_event": "substitution-in",
-      "player": "Keisuke HONDA",
-      "time": "70'"
-    },
-    {
-      "id": 213,
-      "type_of_event": "substitution-out",
-      "player": "Shinji KAGAWA",
-      "time": "70'"
-    },
-    {
-      "id": 215,
-      "type_of_event": "goal",
-      "player": "Yuya OSAKO",
-      "time": "73'"
-    },
-    {
-      "id": 217,
-      "type_of_event": "substitution-in",
-      "player": "Hotaru YAMAGUCHI",
-      "time": "80'"
-    },
-    {
-      "id": 216,
-      "type_of_event": "substitution-out",
-      "player": "Gaku SHIBASAKI",
-      "time": "80'"
-    },
-    {
-      "id": 219,
-      "type_of_event": "substitution-in",
-      "player": "Shinji OKAZAKI",
-      "time": "85'"
-    },
-    {
-      "id": 218,
-      "type_of_event": "substitution-out",
-      "player": "Yuya OSAKO",
-      "time": "85'"
-    },
-    {
-      "id": 221,
-      "type_of_event": "yellow-card",
-      "player": "Eiji KAWASHIMA",
-      "time": "90'+4'"
-    }
-  ]
-}
+  "last_event_update_at": "2018-06-27T15:58:47Z",
+  "last_score_update_at": "2018-06-27T15:58:47Z"
+}]
 ```
 #### TEAM GROUP RESULTS API ENDPOINT
 
@@ -391,42 +625,48 @@ https://worldcup.sfg.io/teams
 
 (Feel free to submit a PR with your project!)
 
+* http://fifa-worldcup.herokuapp.com
+(NodeJS and Express Web App to keep you updated with the FIFA World Cup 2018)
+
+* http://meisam-dodangeh.ir/worldcup (A simple web Page to show today games and games events)
 * https://m.me/244560172984721 (Facebook Messenger bot that shows games for today and tomorrow as well as allowing you to follow along with live matches)
 
-* https://github.com/jthomas/goalbot   
-(Twitter bot ([@WC2018_Goals](https://twitter.com/WC2018_Goals)) which tweets out every goal from the 2018 FIFA World Cup.)  
+* https://github.com/jthomas/goalbot
+(Twitter bot ([@WC2018_Goals](https://twitter.com/WC2018_Goals)) which tweets out every goal from the 2018 FIFA World Cup.)
+* https://github.com/riceluxs1t/EloSoccerPrediction
+(React.js + Django app that shows (live) game data and match outcome predictions using an ELO based Poisson model.)
 
-* https://github.com/justcallmelarry/sportsball   
-(slack integration for updates of goals, cards and results)  
+* https://github.com/justcallmelarry/sportsball
+(slack integration for updates of goals, cards and results)
 
-* https://github.com/selfish/worldcup-slack  
+* https://github.com/selfish/worldcup-slack
 (Node.js Slack game status announcer, updated for 2018 games)
 
-* https://github.com/dg01d/bitbar-worldcup  
+* https://github.com/dg01d/bitbar-worldcup
 (BitBar plugin to show current/daily scores and results)
 
-* https://github.com/nicolopignatelli/wc2018-slack-bot  
+* https://github.com/nicolopignatelli/wc2018-slack-bot
 (Slack bot for updates about the current match)
 
-* https://github.com/wildlifehexagon/node-world-cup  
+* https://github.com/wildlifehexagon/node-world-cup
 (Node.js command line app to display results and standings)
 
-* https://github.com/iricigor/FIFA2018  
+* https://github.com/iricigor/FIFA2018
 (PowerShell wrapper, compatible with both Linux and Windows versions)
 
-* https://github.com/pedsm/liveCup  
+* https://github.com/pedsm/liveCup
 (React.js based dashboard with live updates designed for TVs and Computers)
 
-* https://github.com/johnbfox/world-cup-scores-cli  
+* https://github.com/johnbfox/world-cup-scores-cli
 (Command line tool for getting the day's scores and goals)
 
-* https://github.com/cedricblondeau/world-cup-2018-cli-dashboard   
+* https://github.com/cedricblondeau/world-cup-2018-cli-dashboard
 (CLI Dashboard that displays live updates of the current game, today's schedule and groups, built with react-blessed)
 
-* https://github.com/sazap10/world-cup-discord-bot  
+* https://github.com/sazap10/world-cup-discord-bot
 (Discord bot to display schedule, match information and standings)
 
-* https://github.com/luridarmawan/Carik/  
+* https://github.com/luridarmawan/Carik/
 ([Carik](https://github.com/luridarmawan/Carik/) ChatBot for Facebook Messenger, Telegram, Line, Slack. just type "info world cup".) See screenshots [1](https://cl.ly/102h2A1a3S46) [2](https://cl.ly/1p123j342A3v) [3](https://cl.ly/1T0i1E1P410B)
 
 * https://github.com/arghgr/golbot
@@ -434,6 +674,22 @@ https://worldcup.sfg.io/teams
 
 * https://github.com/kadinho/worldcup-notifications
 (A project to fetch FIFA World Cup matches and send Slack event notifications)
+
+* https://github.com/gk4m/world-cup-scores
+(Simple vue.js based app for displaying results from World Cup 2018.)
+
+* https://apps.lametric.com/apps/fifa_world_cup_2018/6624
+(Display the latest score of the current match(es), or the recent and next matches on a [LaMetric Time](https://lametric.com) device)
+
+* https://world-cup-basecamp.herokuapp.com/
+[Github Link](https://github.com/dskoda1/world-cup-basecamp) - SPA using React/Redux/Material for displaying data from this API
+
+* https://spapas.github.io/wc2018/
+(A WC2018 dashboard using vue.js. Source @ https://github.com/spapas/vue-wc2018)
+
+* https://github.com/eeddaann/ElastiCup
+(Loads World Cup data into Elasticsearch)
+
 
 ## PROJECTS USING THIS API IN 2014
 
@@ -470,7 +726,7 @@ Some people have asked if they can make donations. I'd love for you to donate so
 
 * Scrapers almost finished being reworked
 
-* New param added to the matches endpoint. You can pass `?start_date=2018-06-21` or `?start_date=2018-06-19&end_date=2018-06-24`  
+* New param added to the matches endpoint. You can pass `?start_date=2018-06-21` or `?start_date=2018-06-19&end_date=2018-06-24`
 
   (If you pass one date, you'll get matches for that day, otherwise for the range of days specified. Please use YYYY-MM-DD format even though it is weird for the rest of the world not to use YYYY-DD-MM)
 

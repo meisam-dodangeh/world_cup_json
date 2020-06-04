@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 WorldCupJson::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -10,8 +12,13 @@ WorldCupJson::Application.configure do
   config.eager_load = false
 
   # Show full error reports and disable caching.
-  config.consider_all_requests_local       = true
-  config.action_controller.perform_caching = true
+  config.consider_all_requests_local = true
+  if ENV['DEV_CACHE']
+    config.action_controller.perform_caching = true
+    config.cache_store = :redis_store, 'http://127.0.0.1:6379'
+  else
+    config.action_controller.perform_caching = false
+  end
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false

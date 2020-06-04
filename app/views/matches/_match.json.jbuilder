@@ -1,5 +1,7 @@
-json.(match, :venue, :location, :status, :time, :fifa_id,
-             :weather, :attendance, :officials, :stage_name)
+# frozen_string_literal: true
+
+json.call(match, :venue, :location, :status, :time, :fifa_id,
+          :weather, :attendance, :officials, :stage_name)
 
 json.home_team_country match.home_team&.country
 json.away_team_country match.away_team&.country
@@ -14,10 +16,10 @@ else
 end
 json.home_team do
   if match.home_team
-     json.country match.home_team.country
-     json.code match.home_team.fifa_code
-     json.goals match.home_team_score
-     json.penalties match.json_home_team_penalties
+    json.country match.home_team.country
+    json.code match.home_team.fifa_code
+    json.goals match.home_team_score
+    json.penalties match.json_home_team_penalties
   else
     json.country 'To Be Determined'
     json.code 'TBD'
@@ -26,10 +28,10 @@ json.home_team do
 end
 json.away_team do
   if match.away_team
-     json.country match.away_team.country
-     json.code match.away_team.fifa_code
-     json.goals match.away_team_score
-     json.penalties match.json_away_team_penalties
+    json.country match.away_team.country
+    json.code match.away_team.fifa_code
+    json.goals match.away_team_score
+    json.penalties match.json_away_team_penalties
   else
     json.country 'To Be Determined'
     json.code 'TBD'
@@ -39,14 +41,12 @@ end
 unless @summary
   json.home_team_events do
     if match.home_team
-      json.cache! [match.fifa_id, match.home_team, match.home_team.events], expires_in: @cache_time do
       events = match.home_team_events.sort_by { |e| e.time.to_i }
-        json.array! events do |event|
-          json.id event.id
-          json.type_of_event event.type_of_event
-          json.player event.player
-          json.time event.time
-        end
+      json.array! events do |event|
+        json.id event.id
+        json.type_of_event event.type_of_event
+        json.player event.player
+        json.time event.time
       end
     else
       []
@@ -55,14 +55,12 @@ unless @summary
 
   json.away_team_events do
     if match.away_team
-      json.cache! [match.fifa_id, match.away_team, match.away_team.events], expires_in: @cache_time do
-        events = match.away_team_events.sort_by { |e| e.time.to_i }
-        json.array! events do |event|
-          json.id event.id
-          json.type_of_event event.type_of_event
-          json.player event.player
-          json.time event.time
-        end
+      events = match.away_team_events.sort_by { |e| e.time.to_i }
+      json.array! events do |event|
+        json.id event.id
+        json.type_of_event event.type_of_event
+        json.player event.player
+        json.time event.time
       end
     else
       []
@@ -71,7 +69,12 @@ unless @summary
 
   json.home_team_statistics do
     if match.home_stats
-      json.partial! '/matches/stats', stats: match.home_stats
+      json.country match.home_team.country
+      json.call(match.home_stats, :attempts_on_goal, :on_target, :off_target, :blocked,
+                :corners, :offsides, :ball_possession, :pass_accuracy, :num_passes,
+                :passes_completed, :distance_covered, :tackles,
+                :clearances, :yellow_cards, :red_cards, :fouls_committed, :tactics,
+                :starting_eleven, :substitutes)
     else
       []
     end
@@ -79,7 +82,12 @@ unless @summary
 
   json.away_team_statistics do
     if match.away_stats
-      json.partial! '/matches/stats', stats: match.away_stats
+      json.country match.away_team.country
+      json.call(match.away_stats, :attempts_on_goal, :on_target, :off_target, :blocked,
+                :corners, :offsides, :ball_possession, :pass_accuracy, :num_passes,
+                :passes_completed, :distance_covered, :tackles,
+                :clearances, :yellow_cards, :red_cards, :fouls_committed, :tactics,
+                :starting_eleven, :substitutes)
     else
       []
     end

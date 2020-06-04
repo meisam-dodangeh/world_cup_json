@@ -1,16 +1,48 @@
+# frozen_string_literal: true
+
 module Scrapers
   class JsonScraper
     include HTTParty
 
     def self.write_fifa_info
-      base_url = 'https://api.fifa.com/api/v1/calendar/matches?idCompetition=17&idSeason=254645&language=all&count=500'
+      begin
+        base_url = get_base_url
+        response = get(base_url)
+        json = JSON.parse(response.body)
+        if json['Results'].empty?
+          write_fifa_info_from_derived_url
+        end
+        write_matches_from_json(json)
+      rescue
+        write_fifa_info_from_derived_url
+      end
+    end
+
+    def self.write_fifa_info_from_derived_url
+      base_url = new_base_url
       response = get(base_url)
       json = JSON.parse(response.body)
+      return if json['Results'].empty?
+      write_matches_from_json(json)
+    end
+
+    def self.write_matches_from_json(json)
       Match.all.each do |fixture|
         match_info = json['Results'].find { |match| match['IdMatch'] == fixture.fifa_id }
         json_match = Scrapers::JsonMatch.new(match_info)
         write_fifa_info_for_match(fixture, json_match)
       end
+    end
+
+    def self.get_base_url
+      'https://api.fifa.com/api/v1/calendar/matches?idseason=278513&idcompetition=103&idClient=64e9afa8-c5c0-413d-882b-bc9e6a81e264&language=en-GB&count=500'
+    end
+
+    def self.new_base_url
+      browser = ChromeBrowserHelper.browser
+      browser.goto('https://www.fifa.com/womensworldcup/')
+      html = Nokogiri::HTML(browser.html)
+      html.search('script')&.text&.match(/matchList.url(.+)/)[1].strip[1..-1].strip[1..-3]
     end
 
     def self.write_fifa_info_for_match(fixture, json_match)
@@ -45,6 +77,7 @@ module Scrapers
       if response.code == 200
         match_info = JSON.parse(response.body)
         return false if match_info.blank?
+        write_picture_urls(match_info)
         json_match = Scrapers::JsonMatch.new(match_info)
         write_match_info(json_match)
         write_scores(json_match)
@@ -56,6 +89,25 @@ module Scrapers
 
     private
 
+    def write_picture_urls(match_info)
+      write_home_picture_url(match_info)
+      write_away_picture_url(match_info)
+    end
+
+    def write_home_picture_url(match_info)
+      return if @fixture.home_team.flag_url.present?
+      flag = match_info.dig('HomeTeam').dig('PictureUrl').gsub('{format}', 'wwc2019').gsub('{size}', '4')
+      return unless flag
+      @fixture.home_team.update_attribute(:flag_url, flag)
+    end
+
+    def write_away_picture_url(match_info)
+      return if @fixture.away_team.flag_url.present?
+      flag = match_info.dig('AwayTeam').dig('PictureUrl').gsub('{format}', 'wwc2019').gsub('{size}', '4')
+      return unless flag
+      @fixture.away_team.update_attribute(:flag_url, flag)
+    end
+
     def write_match_info(json_match)
       @fixture.attendance = json_match.attendance
       @fixture.weather = json_match.weather_info
@@ -65,8 +117,8 @@ module Scrapers
     def write_scores(json_match)
       @fixture.json_home_team_score = json_match.home_score
       @fixture.json_away_team_score = json_match.away_score
-      @fixture.json_away_team_penalties = json_match.home_penalties
-      @fixture.json_home_team_penalties = json_match.away_penalties
+      @fixture.json_away_team_penalties = json_match.away_penalties
+      @fixture.json_home_team_penalties = json_match.home_penalties
     end
 
     def write_match_stats(json_match)

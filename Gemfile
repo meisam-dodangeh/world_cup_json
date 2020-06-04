@@ -1,7 +1,9 @@
-source 'https://rubygems.org'
-ruby '2.5.1'
+# frozen_string_literal: true
 
-gem 'rails', '4.2.10'
+source 'https://rubygems.org'
+ruby '2.5.3'
+
+gem 'rails', '4.2.11.1'
 
 gem 'pg', '= 0.20'
 
@@ -17,29 +19,30 @@ gem 'chronic'
 gem 'clockwork'
 gem 'connection_pool'
 gem 'foundation-rails', '~> 5'
-gem 'httparty'
 gem 'haml-rails'
+gem 'httparty'
 gem 'jbuilder'
 gem 'jbuilder_cache_multi'
+gem 'lograge'
+gem 'oj'
 gem 'platform-api'
 gem 'puma'
 gem 'puma_worker_killer'
 gem 'rack-attack'
 gem 'rack-cors', require: 'rack/cors'
-gem 'rails_autoscale_agent'
 gem 'redis-rails'
-gem 'scout_apm'
 gem 'responders', '~> 2.0'
 gem 'watir'
+gem 'webdrivers'
 
 group :production do
   gem 'rails_12factor'
+  gem 'scout_apm'
 end
 
 group :development do
   gem 'derailed_benchmarks'
   gem 'stackprof'
-  gem 'chromedriver-helper'
 end
 
 group :development, :test do
@@ -50,6 +53,5 @@ group :development, :test do
 end
 
 group :doc do
-  # bundle exec rake doc:rails generates the API under doc/api.
   gem 'sdoc', require: false
 end

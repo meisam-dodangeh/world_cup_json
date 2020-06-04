@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180626044822) do
+ActiveRecord::Schema.define(version: 20190605010638) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -129,6 +129,7 @@ ActiveRecord::Schema.define(version: 20180626044822) do
     t.integer  "team_goals_for"
     t.integer  "team_goals_against"
     t.integer  "team_goal_differential"
+    t.string   "flag_url"
   end
 
   add_index "teams", ["fifa_code"], name: "index_teams_on_fifa_code", using: :btree

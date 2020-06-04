@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 namespace :setup do
   desc 'setup the teams'
   task generate_teams: :environment do
     Team.destroy_all
 
-    path = Rails.root+'lib/assets/team.json'
+    path = Rails.root + 'lib/assets/team.json'
     file = File.read(path)
     teams = JSON.parse(file)
-    groups = ('A'..'H').to_a
+    groups = ('A'..'F').to_a
     groups.each do |let|
       new_group = Group.find_or_create_by(letter: let)
       new_group.save
